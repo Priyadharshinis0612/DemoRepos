@@ -2,17 +2,18 @@
 
 pipeline {
     environment {
-        JAVA_TOOL_OPTIONS = "-Duser.home=/var/jenkins_home"
+        JAVA_TOOL_OPTIONS = "-Duser.home=/tmp/maven"
         DEMO="Demo"
     }
-   agent  { 
-       docker {
-          image "ssriram12/maven-3.9.9:jdk13"
-          label "docker"
-           args "-v /tmp/maven:/var/jenkins_home -e MAVEN_CONFIG=/var/jenkins_home"
-        }
-		} 
-// 	any 
+   agent  any 
+   //{  
+      // docker {
+         // image "ssriram12/maven-3.9.9:jdk13"
+          //label "docker"
+           //args "-v /tmp/maven:/tmp/maven -e MAVEN_CONFIG=/tmp/maven"
+        //}
+		//} 
+ //any 
     
 
     stages {
