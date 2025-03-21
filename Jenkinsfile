@@ -1,3 +1,4 @@
+
 #!groovy
 
 pipeline {
@@ -52,25 +53,16 @@ pipeline {
 
 stage("Build Docker file") {
             steps {
-                sh "docker build . -t priyadharshinis0612/demorepos -f DockerfileBuild" 
-            }
-        }
-		
-		stage("Push to Docker Hub") {
-            steps {
-                //sh "mvn package install"
-				withCredentials([usernamePassword(credentialsId: 'DockerHub_Credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-			sh 'echo $PASSWORD | docker login -u  $USER --password-stdin'
-			sh 'docker logout'
-}
+                sh "docker build . -t priyadharshinis0612/demoreposapp -f DockerfileBuild" 
             }
         }
 
     }
 
-    post {
-        always {
-            cleanWs()
-        }
-    }
+   stage("Push to Docker Hub") { 
+	   steps { 
+		   //sh "mvn package install"
+		   withCredentials([usernamePassword(credentialsId: 'DockerHub_Credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]){ 
+			   sh 'echo $PASSWORD | docker login -u  $USER --password-stdin' 
+			   sh 'docker logout' } } }
 }
