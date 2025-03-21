@@ -52,7 +52,7 @@ pipeline {
 
 stage("Build Docker file") {
             steps {
-                sh "docker build . -t priyadharshinis0612/demoreposapp -f DockerfileBuild" 
+                sh "docker build . -t priyadharshinis0612/Demorepos -f Dockerfile" 
             }
         }
 		
