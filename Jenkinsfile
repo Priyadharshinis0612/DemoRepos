@@ -1,68 +1,60 @@
-
-#!groovy
-
 pipeline {
     environment {
         JAVA_TOOL_OPTIONS = "-Duser.home=/tmp/maven"
-        DEMO="Demo"
+        DEMO = "Demo"
     }
-   agent  any 
-   //{  
-      // docker {
-         // image "ssriram12/maven-3.9.9:jdk13"
-          //label "docker"
-           //args "-v /tmp/maven:/tmp/maven -e MAVEN_CONFIG=/tmp/maven"
-        //}
-		//} 
- //any 
     
+    agent any
 
     stages {
-        stage("Build") {
+        stage('Build') {
             steps {
-                sh "mvn -version"
-                sh "echo id = `id`"
-		  //sh "sudo chown -R jenkins:jenkins /home/jenkins"
-		// sh "echo TOKEN : $TOKEN" 
-                sh "mvn clean compile"
-            }
-        }
-	stage("Test") {
-            steps {
-                sh "mvn test"
-            }
-        }
-	//stage("SonarAnalysis")
-	//{
-		//def scannerHome = tool 'SonarQubeScanner';
-		// agent { label "docker" } 
-		//steps {
-			//sh "echo to be implemented" 
-			//withSonarQubeEnv("SonarServer") {
-			//sh "/home/sidkalpop/scanner/bin/sonar-scanner"
-			//sh "echo to be implemented"
-			//} 
-		//}
-	//} 
-
-	stage("Package & Deploy") {
-            steps {
-                sh "mvn package install"
+                sh 'mvn -version'
+                sh 'echo id = `id`'
+                sh 'mvn clean compile'
             }
         }
 
-stage("Build Docker file") {
+        stage('Test') {
             steps {
-                sh "docker build . -t priyadharshinis0612/demoreposapp -f DockerfileBuild" 
+                sh 'mvn test'
             }
         }
 
+        // Uncomment this stage if you plan to implement SonarQube analysis
+        /*
+        stage('SonarAnalysis') {
+            def scannerHome = tool 'SonarQubeScanner'
+            agent { label 'docker' } 
+            steps {
+                sh 'echo to be implemented'
+                withSonarQubeEnv('SonarServer') {
+                    sh '/home/sidkalpop/scanner/bin/sonar-scanner'
+                    sh 'echo to be implemented'
+                }
+            }
+        }
+        */
+
+        stage('Package & Deploy') {
+            steps {
+                sh 'mvn package install'
+            }
+        }
+
+        stage('Build Docker file') {
+            steps {
+                sh 'docker build . -t priyadharshinis0612/demoreposapp -f DockerfileBuild'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerHub_Credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
+                    sh 'echo $PASSWORD | docker login -u $USER --password-stdin'
+                    sh 'docker logout'
+                }
+            }
+        }
     }
-
-   stage("Push to Docker Hub") { 
-	   steps { 
-		   //sh "mvn package install"
-		   withCredentials([usernamePassword(credentialsId: 'DockerHub_Credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]){ 
-			   sh 'echo $PASSWORD | docker login -u  $USER --password-stdin' 
-			   sh 'docker logout' } } }
 }
